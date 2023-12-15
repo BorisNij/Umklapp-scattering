@@ -1,6 +1,7 @@
 course:
-  create-course: INSERT INTO courses (course_name, course_description) VALUES (:courseName, :courseDescription)
+    create: INSERT INTO courses (course_name, course_description) VALUES (:courseName, :courseDescription)
   find-by-id: SELECT course_id, course_name, course_description FROM courses WHERE course_id = :courseId
   find-by-name: SELECT course_id, course_name, course_description FROM courses WHERE course_name = :courseName
   find-all: SELECT course_id, course_name, course_description FROM courses ORDER BY course_id LIMIT :limit OFFSET :offset
+    update: UPDATE courses SET course_name = :courseName, course_description = :courseDescription WHERE course_id = :courseId
   delete-by-id: DELETE FROM courses WHERE course_id = :courseId
