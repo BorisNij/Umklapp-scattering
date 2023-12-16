@@ -1,4 +1,4 @@
-package net.bnijik.schooldbcli.dao;
+package net.bnijik.schooldbcli.dao.course;
 
 import net.bnijik.schooldbcli.config.YamlPropertySourceFactory;
 import org.springframework.beans.factory.annotation.Value;
