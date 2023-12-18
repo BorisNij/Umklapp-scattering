@@ -18,6 +18,10 @@ public record CourseQueries(@Value("${course.create}") String create,
     public static final String COURSE_ID_PARAM = "courseId";
     public static final String COURSE_NAME_PARAM = "courseName";
     public static final String COURSE_DESCRIPTION_PARAM = "courseDescription";
+    public static final String COURSE_ID_COLUMN = "course_id";
+    public static final String COURSE_NAME_COLUMN = "course_name";
+    public static final String COURSE_DESCRIPTION_COLUMN = "course_description";
+    public static final String COURSE_TABLE_NAME = "courses";
 
     @Override
     public boolean equals(Object o) {

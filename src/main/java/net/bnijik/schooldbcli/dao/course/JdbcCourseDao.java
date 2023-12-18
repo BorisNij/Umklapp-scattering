@@ -20,14 +20,51 @@ public class JdbcCourseDao implements CourseDao {
     private final SimpleJdbcInsert insert;
     private final NamedParameterJdbcTemplate template;
     private final CourseQueries queries;
-    private final RowMapper<Course> rowMapper = (rowSet, rowNum) -> new Course(rowSet.getLong("COURSE_ID"),
-                                                                               rowSet.getString("COURSE_NAME"),
-                                                                               rowSet.getString("COURSE_DESCRIPTION"));
+    private final RowMapper<Course> rowMapper = (rowSet, rowNum) -> new Course(rowSet.getLong(CourseQueries.COURSE_ID_COLUMN),
+                                                                               rowSet.getString(CourseQueries.COURSE_NAME_COLUMN),
+                                                                               rowSet.getString(CourseQueries.COURSE_DESCRIPTION_COLUMN));
 
     public JdbcCourseDao(NamedParameterJdbcTemplate template, SimpleJdbcInsert insert, CourseQueries queries) {
-        this.insert = insert;
+        this.insert = insert.withTableName(CourseQueries.COURSE_TABLE_NAME)
+                .usingGeneratedKeyColumns(CourseQueries.COURSE_ID_COLUMN);
         this.template = template;
         this.queries = queries;
+    }
+
+    @Override
+    public long create(String courseName, String courseDescription) {
+        try {
+            final Number id = insert.executeAndReturnKey(Map.<String, Object>of(CourseQueries.COURSE_NAME_COLUMN,
+                                                                                courseName,
+                                                                                CourseQueries.COURSE_DESCRIPTION_COLUMN,
+                                                                                courseDescription));
+            if (id.longValue() == 0) {
+                log.error("Creating course failed. Returned ID: {}", id);
+                return 0;
+            }
+            return id.longValue();
+        } catch (DataAccessException e) {
+            log.error("Error creating {} course: {}", courseName, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public long save(Course course) {
+        try {
+            final Number id = insert.executeAndReturnKey(Map.<String, Object>of(CourseQueries.COURSE_NAME_COLUMN,
+                                                                                course.courseName(),
+                                                                                CourseQueries.COURSE_DESCRIPTION_COLUMN,
+                                                                                course.courseDescription()));
+            if (id.longValue() == 0) {
+                log.error("Saving course failed. Returned ID: {}", id);
+                return 0;
+            }
+            return id.longValue();
+        } catch (DataAccessException e) {
+            log.error("Error saving {} course: {}", course.courseName(), e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override
@@ -42,22 +79,7 @@ public class JdbcCourseDao implements CourseDao {
                                            rowMapper);
         } catch (DataAccessException e) {
             log.error("Error retrieving all courses: {}", e.getMessage(), e);
-            return Stream.empty();
-        }
-    }
-
-    @Override
-    public void save(Course course) {
-        try {
-            final Number id = insert.execute(Map.of(CourseQueries.COURSE_NAME_PARAM,
-                                                    course.courseName(),
-                                                    CourseQueries.COURSE_DESCRIPTION_PARAM,
-                                                    course.courseDescription()));
-            if (id.longValue() == 0) {
-                log.error("Saving course failed. No rows were affected.");
-            }
-        } catch (DataAccessException e) {
-            log.error("Error saving {} course: {}", course.courseName(), e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -68,33 +90,45 @@ public class JdbcCourseDao implements CourseDao {
             return template.queryForStream(sql, Map.of(CourseQueries.COURSE_ID_PARAM, id), rowMapper).findFirst();
         } catch (DataAccessException e) {
             log.error("Error finding course with ID {}: {}", id, e.getMessage(), e);
-            return Optional.empty();
+            throw e;
         }
     }
 
     @Override
-    public void update(Course newCourse, long existingCourseId) {
+    public boolean update(Course newCourse, long existingCourseId) {
         String sql = queries.update();
         try {
-            template.update(sql,
-                            Map.of(CourseQueries.COURSE_NAME_PARAM,
-                                   newCourse.courseName(),
-                                   CourseQueries.COURSE_DESCRIPTION_PARAM,
-                                   newCourse.courseDescription(),
-                                   CourseQueries.COURSE_ID_PARAM,
-                                   existingCourseId));
+            final int rowsAffected = template.update(sql,
+                                                     Map.of(CourseQueries.COURSE_NAME_PARAM,
+                                                            newCourse.courseName(),
+                                                            CourseQueries.COURSE_DESCRIPTION_PARAM,
+                                                            newCourse.courseDescription(),
+                                                            CourseQueries.COURSE_ID_PARAM,
+                                                            existingCourseId));
+            if (rowsAffected == 0) {
+                log.error("Failed to update course with ID {}. No rows were affected.", existingCourseId);
+                return false;
+            }
+            return true;
         } catch (DataAccessException e) {
             log.error("Error updating course with ID {}: {}", existingCourseId, e.getMessage(), e);
+            throw e;
         }
     }
 
     @Override
-    public void delete(long id) {
+    public boolean delete(long id) {
         String sql = queries.deleteById();
         try {
-            template.update(sql, Map.of(CourseQueries.COURSE_ID_PARAM, id));
+            final int rowsAffected = template.update(sql, Map.of(CourseQueries.COURSE_ID_PARAM, id));
+            if (rowsAffected == 0) {
+                log.error("Failed to delete course with ID {}. No rows were affected.", id);
+                return false;
+            }
+            return true;
         } catch (DataAccessException e) {
             log.error("Error deleting course with ID {}: {}", id, e.getMessage(), e);
+            return false;
         }
     }
 }

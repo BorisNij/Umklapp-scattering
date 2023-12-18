@@ -4,4 +4,5 @@ import net.bnijik.schooldbcli.dao.Dao;
 import net.bnijik.schooldbcli.model.Course;
 
 public interface CourseDao extends Dao<Course> {
+    long create(String courseName, String courseDescription);
 }

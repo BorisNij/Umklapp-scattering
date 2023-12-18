@@ -9,7 +9,7 @@
         <file>target/logs/school_app.log</file> <!-- Base log file name -->
 
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>school_app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>target/logs/school_app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize> <!-- Max file size per log file -->
             <maxHistory>30</maxHistory> <!-- Number of archived log files to keep -->
 
