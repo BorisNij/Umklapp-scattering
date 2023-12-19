@@ -31,28 +31,11 @@ public class JdbcCourseDao implements CourseDao {
         this.queries = queries;
     }
 
-    @Override
-    public long create(String courseName, String courseDescription) {
-        try {
-            final Number id = insert.executeAndReturnKey(Map.<String, Object>of(CourseQueries.COURSE_NAME_COLUMN,
-                                                                                courseName,
-                                                                                CourseQueries.COURSE_DESCRIPTION_COLUMN,
-                                                                                courseDescription));
-            if (id.longValue() == 0) {
-                log.error("Creating course failed. Returned ID: {}", id);
-                return 0;
-            }
-            return id.longValue();
-        } catch (DataAccessException e) {
-            log.error("Error creating {} course: {}", courseName, e.getMessage(), e);
-            throw e;
-        }
-    }
 
     @Override
     public long save(Course course) {
         try {
-            final Number id = insert.executeAndReturnKey(Map.<String, Object>of(CourseQueries.COURSE_NAME_COLUMN,
+            final Number id = insert.executeAndReturnKey(Map.of(CourseQueries.COURSE_NAME_COLUMN,
                                                                                 course.courseName(),
                                                                                 CourseQueries.COURSE_DESCRIPTION_COLUMN,
                                                                                 course.courseDescription()));

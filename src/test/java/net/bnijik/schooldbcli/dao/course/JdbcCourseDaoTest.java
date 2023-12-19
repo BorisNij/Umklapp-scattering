@@ -13,9 +13,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,11 +47,6 @@ class JdbcCourseDaoTest {
         assertEquals(expected, optionalCourse.get());
     }
 
-    @Test
-    @DisplayName("when creating course should create course")
-    void whenCreatingCourseShouldCreateCourse() {
-        assertEquals(4L, courseDao.create("Another course", "Another description"));
-    }
 
     @Test
     @DisplayName("when saving course should save course")
@@ -80,14 +73,12 @@ class JdbcCourseDaoTest {
     @Test
     @DisplayName("when deleting course by id should remove it from the database")
     void whenDeletingCourseByIdShouldRemoveFromDatabase() {
-        final List<Course> courses = courseDao.findAll(Page.of(1, 10)).collect(Collectors.toList());
         assertTrue(courseDao.delete(1L));
     }
 
     @Test
     @DisplayName("when updating existing course should update course")
     void whenUpdatingExistingCourseShouldUpdateCourseWithRightDetails() {
-        Course toUpdate = new Course(3L, "Course to delete", "Description");
-        assertTrue(courseDao.update(new Course(3L, "Course to stay", "Modified description"), 3L));
+        assertTrue(courseDao.update(new Course(3L, "Modified course name", "Modified description"), 3L));
     }
 }
