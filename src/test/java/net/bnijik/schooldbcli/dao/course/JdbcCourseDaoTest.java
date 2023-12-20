@@ -2,14 +2,11 @@ package net.bnijik.schooldbcli.dao.course;
 
 import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Course;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -20,22 +17,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @JdbcTest
-@ContextConfiguration(classes = CourseQueries.class)
+@ContextConfiguration(classes = {CourseQueries.class, JdbcCourseDaoTestConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "/sql/drop_create_tables.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = {"/sql/clear_tables.sql", "/sql/sample_data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class JdbcCourseDaoTest {
     @Autowired
-    private NamedParameterJdbcTemplate template;
-    @Autowired
-    private CourseQueries queries;
     private JdbcCourseDao courseDao;
-
-    @BeforeEach
-    void setUp() {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(template.getJdbcTemplate());
-        courseDao = new JdbcCourseDao(template, insert, queries);
-    }
 
     @Test
     @DisplayName("when finding course by id should return the right course")
