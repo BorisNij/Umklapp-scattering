@@ -10,11 +10,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @JdbcTest
 @ContextConfiguration(classes = {GroupQueries.class, JdbcGroupDaoTestConfig.class})
@@ -71,6 +71,21 @@ class JdbcGroupDaoTest {
                 c.equals(expectedGroup2) ||
                 c.equals(expectedGroup3)).count();
         assertEquals(3, count);
+    }
+
+    @Test
+    @DisplayName("when getting groups by max student count should return correct groups")
+    void whenGettingGroupsByMaxStudentCountShouldReturnCorrectGroups() {
+        Group group1 = new Group(1, "BB-22");
+        Group group2 = new Group(2, "CC-33");
+        Group group3 = new Group(3, "Group to Delete");
+
+        List<Group> groups = groupDao.findAllByMaxStudentCount(1, Page.of(1, 5)).toList();
+
+        assertEquals(2, groups.size());
+        assertTrue(groups.contains(group1));
+        assertTrue(groups.contains(group3));
+        assertFalse(groups.contains(group2));
     }
 
     @Test
