@@ -23,7 +23,7 @@ public class JdbcGroupDao implements GroupDao {
     private final RowMapper<Group> rowMapper = (rowSet, rowNum) -> new Group(rowSet.getLong(GroupQueries.GROUP_ID_COLUMN),
                                                                              rowSet.getString(GroupQueries.GROUP_NAME_COLUMN));
 
-    public JdbcGroupDao(SimpleJdbcInsert insert, NamedParameterJdbcTemplate template, GroupQueries queries) {
+    public JdbcGroupDao(NamedParameterJdbcTemplate template, SimpleJdbcInsert insert, GroupQueries queries) {
         this.insert = insert.withTableName(GroupQueries.GROUP_TABLE_NAME)
                 .usingGeneratedKeyColumns(GroupQueries.GROUP_ID_COLUMN);
         this.template = template;
@@ -57,6 +57,17 @@ public class JdbcGroupDao implements GroupDao {
             return id.longValue();
         } catch (DataAccessException e) {
             log.error("Error saving {} group: {}", group.groupName(), e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Optional<Group> findByName(String name) {
+        String sql = queries.findByName();
+        try {
+            return template.queryForStream(sql, Map.of(GroupQueries.GROUP_NAME_PARAM, name), rowMapper).findFirst();
+        } catch (DataAccessException e) {
+            log.error("Error finding group with name {}: {}", name, e.getMessage(), e);
             throw e;
         }
     }

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @PropertySource(factory = YamlPropertySourceFactory.class, value = "classpath:queries.yml")
-public record GroupQueries(@Value("${group.find-by-id}") String findById, @Value("${group.find-all}") String finaAll,
-                           @Value("${group.update}") String update, @Value("${group.delete-by-id}") String deleteById) {
+public record GroupQueries(@Value("${group.find-by-id}") String findById,
+                           @Value("${group.find-by-name}") String findByName,
+                           @Value("${group.find-all}") String finaAll, @Value("${group.update}") String update,
+                           @Value("${group.delete-by-id}") String deleteById) {
     public static final String GROUP_ID_PARAM = "groupId";
     public static final String GROUP_NAME_PARAM = "groupName";
     public static final String GROUP_ID_COLUMN = "group_id";
