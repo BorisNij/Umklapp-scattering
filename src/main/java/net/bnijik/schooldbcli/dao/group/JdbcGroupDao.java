@@ -31,6 +31,32 @@ public class JdbcGroupDao implements GroupDao {
     }
 
     @Override
+    public long save(Group group) {
+        try {
+            final Number id = insert.executeAndReturnKey(Map.of(GroupQueries.GROUP_NAME_COLUMN, group.groupName()));
+            if (id.longValue() == 0) {
+                log.error("Saving group failed. Returned ID: {}", id);
+                return 0;
+            }
+            return id.longValue();
+        } catch (DataAccessException e) {
+            log.error("Error saving {} group: {}", group.groupName(), e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public Optional<Group> findById(long id) {
+        String sql = queries.findById();
+        try {
+            return template.queryForStream(sql, Map.of(GroupQueries.GROUP_ID_PARAM, id), rowMapper).findFirst();
+        } catch (DataAccessException e) {
+            log.error("Error finding group with ID {}: {}", id, e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
     public Stream<Group> findAll(Page page) {
         String sql = queries.finaAll();
         try {
@@ -47,21 +73,6 @@ public class JdbcGroupDao implements GroupDao {
     }
 
     @Override
-    public long save(Group group) {
-        try {
-            final Number id = insert.executeAndReturnKey(Map.of(GroupQueries.GROUP_NAME_COLUMN, group.groupName()));
-            if (id.longValue() == 0) {
-                log.error("Saving group failed. Returned ID: {}", id);
-                return 0;
-            }
-            return id.longValue();
-        } catch (DataAccessException e) {
-            log.error("Error saving {} group: {}", group.groupName(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    @Override
     public Optional<Group> findByName(String name) {
         String sql = queries.findByName();
         try {
@@ -73,12 +84,19 @@ public class JdbcGroupDao implements GroupDao {
     }
 
     @Override
-    public Optional<Group> findById(long id) {
-        String sql = queries.findById();
+    public Stream<Group> findAllByMaxStudentCount(int maxStudentCount, Page page) {
+        String sql = queries.findAllByMaxStudCount();
         try {
-            return template.queryForStream(sql, Map.of(GroupQueries.GROUP_ID_PARAM, id), rowMapper).findFirst();
+            return template.queryForStream(sql,
+                                           Map.of(GroupQueries.GROUP_STUD_COUNT_PARAM,
+                                                  maxStudentCount,
+                                                  Page.PAGE_LIMIT_PARAM,
+                                                  page.getLimit(),
+                                                  Page.PAGE_OFFSET_PARAM,
+                                                  page.getOffset()),
+                                           rowMapper);
         } catch (DataAccessException e) {
-            log.error("Error finding group with ID {}: {}", id, e.getMessage(), e);
+            log.error("Error retrieving all groups having at most {} students: {}", maxStudentCount, e.getMessage(), e);
             throw e;
         }
     }
@@ -115,7 +133,7 @@ public class JdbcGroupDao implements GroupDao {
             return true;
         } catch (DataAccessException e) {
             log.error("Error deleting group with ID {}: {}", id, e.getMessage(), e);
-            return false;
+            throw e;
         }
     }
 }

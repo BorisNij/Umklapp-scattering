@@ -7,5 +7,12 @@ group:
     find-by-id: SELECT group_id, group_name FROM groups WHERE group_id = :groupId
     find-by-name: SELECT group_id, group_name FROM groups WHERE group_name = :groupName
     find-all: SELECT group_id, group_name FROM groups ORDER BY group_id LIMIT :limit OFFSET :offset
+    find-all-by-max-stud-count:
+        SELECT groups.group_id, groups.group_name
+        FROM groups
+        LEFT JOIN students ON groups.group_id = students.group_id
+        GROUP BY groups.group_id
+        HAVING COUNT(students.student_id) <= :studentCount
+        LIMIT :limit OFFSET :offset
     update: UPDATE groups SET group_name = :groupName WHERE group_id = :groupId
     delete-by-id: DELETE FROM groups WHERE group_id = :groupId
