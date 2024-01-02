@@ -67,6 +67,26 @@ public class JdbcCourseDao implements CourseDao {
     }
 
     @Override
+    public Stream<Course> findAllForStudent(int studentId, Page page) {
+        String sql = queries.findAllForStudent();
+        try {
+
+            return template.queryForStream(sql,
+                                           Map.of(CourseQueries.STUDENT_ID_PARAM,
+                                                  studentId,
+                                                  Page.PAGE_LIMIT_PARAM,
+                                                  page.getLimit(),
+                                                  Page.PAGE_OFFSET_PARAM,
+                                                  page.getOffset()),
+                                           rowMapper);
+        } catch (DataAccessException e) {
+            log.error("Error retrieving all courses having for student having ID {}: {}", studentId, e.getMessage(), e);
+            throw e;
+        }
+
+    }
+
+    @Override
     public Optional<Course> findById(long id) {
         String sql = queries.findById();
         try {
@@ -111,7 +131,7 @@ public class JdbcCourseDao implements CourseDao {
             return true;
         } catch (DataAccessException e) {
             log.error("Error deleting course with ID {}: {}", id, e.getMessage(), e);
-            return false;
+            throw e;
         }
     }
 }
