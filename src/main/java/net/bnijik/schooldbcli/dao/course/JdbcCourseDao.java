@@ -35,6 +35,7 @@ public class JdbcCourseDao implements CourseDao {
     @Override
     public long save(Course course) {
         try {
+            log.debug("Saving course '{}'", course.courseName());
             final Number id = insert.executeAndReturnKey(Map.of(CourseQueries.COURSE_NAME_COLUMN,
                                                                                 course.courseName(),
                                                                                 CourseQueries.COURSE_DESCRIPTION_COLUMN,
@@ -54,6 +55,7 @@ public class JdbcCourseDao implements CourseDao {
     public Stream<Course> findAll(Page page) {
         String sql = queries.finaAll();
         try {
+            log.debug("Finding all courses with limit {} and offset {}", page.getLimit(), page.getOffset());
             return template.queryForStream(sql,
                                            Map.of(Page.PAGE_LIMIT_PARAM,
                                                   page.getLimit(),
@@ -70,7 +72,10 @@ public class JdbcCourseDao implements CourseDao {
     public Stream<Course> findAllForStudent(int studentId, Page page) {
         String sql = queries.findAllForStudent();
         try {
-
+            log.debug("Finding all courses for student having ID {} with limit {} and offset {}",
+                      studentId,
+                      page.getLimit(),
+                      page.getOffset());
             return template.queryForStream(sql,
                                            Map.of(CourseQueries.STUDENT_ID_PARAM,
                                                   studentId,
@@ -90,6 +95,7 @@ public class JdbcCourseDao implements CourseDao {
     public Optional<Course> findById(long id) {
         String sql = queries.findById();
         try {
+            log.debug("Finding course with ID {}", id);
             return template.queryForStream(sql, Map.of(CourseQueries.COURSE_ID_PARAM, id), rowMapper).findFirst();
         } catch (DataAccessException e) {
             log.error("Error finding course with ID {}: {}", id, e.getMessage(), e);
@@ -101,6 +107,7 @@ public class JdbcCourseDao implements CourseDao {
     public boolean update(Course newCourse, long existingCourseId) {
         String sql = queries.update();
         try {
+            log.debug("Updating course having ID {} with new name '{}'", existingCourseId, newCourse.courseName());
             final int rowsAffected = template.update(sql,
                                                      Map.of(CourseQueries.COURSE_NAME_PARAM,
                                                             newCourse.courseName(),
@@ -123,6 +130,7 @@ public class JdbcCourseDao implements CourseDao {
     public boolean delete(long id) {
         String sql = queries.deleteById();
         try {
+            log.debug("Deleting course with ID {}", id);
             final int rowsAffected = template.update(sql, Map.of(CourseQueries.COURSE_ID_PARAM, id));
             if (rowsAffected == 0) {
                 log.error("Failed to delete course with ID {}. No rows were affected.", id);
