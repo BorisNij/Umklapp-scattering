@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -68,5 +69,18 @@ class JdbcCourseDaoTest {
     @DisplayName("when updating existing course should update course")
     void whenUpdatingExistingCourseShouldUpdateCourseWithRightDetails() {
         assertTrue(courseDao.update(new Course(3L, "Modified course name", "Modified description"), 3L));
+    }
+
+    @Test
+    @DisplayName("when getting courses for a student should return the correct courses")
+    void whenGettingCoursesForStudentShouldReturnCorrectCourses() {
+        Course expectedCourse1 = new Course(1L, "Course1", "Description1");
+        Course expectedCourse2 = new Course(2L, "Course2", "Description2");
+        List<Course> enrolledCourses = courseDao.findAllForStudent(1, Page.of(1, 5)).toList();
+
+
+        assertTrue(enrolledCourses.contains(expectedCourse1));
+        assertTrue(enrolledCourses.contains(expectedCourse2));
+        assertEquals(2, enrolledCourses.size());
     }
 }
