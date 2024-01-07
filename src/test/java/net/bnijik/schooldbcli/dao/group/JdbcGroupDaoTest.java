@@ -27,7 +27,7 @@ class JdbcGroupDaoTest {
     private JdbcGroupDao groupDao;
 
     @Test
-    @DisplayName("when saving group of certain name should ave group")
+    @DisplayName("when saving group of certain name should save group")
     void whenSavingGroupOfCertainNameShouldSaveGroup() {
 
         final Group expected = new Group(4, "AA-11");
