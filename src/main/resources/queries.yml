@@ -22,3 +22,16 @@ group:
         LIMIT :limit OFFSET :offset
     update: UPDATE groups SET group_name = :groupName WHERE group_id = :groupId
     delete-by-id: DELETE FROM groups WHERE group_id = :groupId
+student:
+    find-by-id: SELECT student_id, group_id, first_name, last_name FROM students WHERE student_id = :studentId
+    find-all: SELECT student_id, group_id, first_name, last_name FROM students ORDER BY student_id LIMIT :limit OFFSET :offset
+    find-all-by-course-name:
+        SELECT students.student_id, students.first_name, students.last_name, students.group_id
+        FROM students
+        JOIN student_course ON students.student_id = student_course.student_id
+        JOIN courses ON student_course.course_id = courses.course_id
+        WHERE courses.course_name = :courseName
+    enroll-in-courses: INSERT INTO student_course (student_id, course_id) VALUES (:studentId, :courseId)
+    withdraw-from-course: DELETE FROM student_course WHERE student_id = :studentId AND course_id = :courseId
+    update: UPDATE students SET first_name = :firstName, last_name = :lastName, group_id = :groupId WHERE student_id = :studentId
+    delete-by-id: DELETE FROM students WHERE student_id = :studentId
