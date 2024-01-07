@@ -1,6 +1,6 @@
 package net.bnijik.schooldbcli.model;
 
-public record Course(Long courseId, String courseName, String courseDescription) {
+public record Course(long courseId, String courseName, String courseDescription) {
 
     @Override
     public String toString() {
