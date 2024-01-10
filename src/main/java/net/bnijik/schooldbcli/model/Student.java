@@ -1,19 +1,10 @@
 package net.bnijik.schooldbcli.model;
 
+import java.util.Objects;
+
 public record Student(long studentId, long groupId, String firstName, String lastName) {
-    @Override
-    public String toString() {
-        return "Student{" +
-                "studentId=" +
-                studentId +
-                ", groupId=" +
-                groupId +
-                ", firstName='" +
-                firstName +
-                '\'' +
-                ", lastName='" +
-                lastName +
-                '\'' +
-                '}';
+    public Student {
+        Objects.requireNonNull(firstName);
+        Objects.requireNonNull(lastName);
     }
 }

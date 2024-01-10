@@ -1,8 +1,9 @@
 package net.bnijik.schooldbcli.model;
 
+import java.util.Objects;
+
 public record Group(long groupId, String groupName) {
-    @Override
-    public String toString() {
-        return "Group{" + "groupId=" + groupId + ", groupName='" + groupName + '\'' + '}';
+    public Group {
+        Objects.requireNonNull(groupName);
     }
 }
