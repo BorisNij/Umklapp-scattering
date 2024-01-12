@@ -1,18 +1,10 @@
 package net.bnijik.schooldbcli.model;
 
-public record Course(Long courseId, String courseName, String courseDescription) {
+import java.util.Objects;
 
-    @Override
-    public String toString() {
-        return "Course{" +
-                "courseId=" +
-                courseId +
-                ", courseName='" +
-                courseName +
-                '\'' +
-                ", courseDescription='" +
-                courseDescription +
-                '\'' +
-                '}';
+public record Course(long courseId, String courseName, String courseDescription) {
+    public Course {
+        Objects.requireNonNull(courseName);
+        Objects.requireNonNullElse(courseDescription, "");
     }
 }
