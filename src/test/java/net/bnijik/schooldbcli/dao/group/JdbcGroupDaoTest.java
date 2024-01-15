@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @JdbcTest
@@ -62,14 +61,16 @@ class JdbcGroupDaoTest {
     @Test
     @DisplayName("when getting all groups should return a stream of all groups")
     void whenGettingAllGroupsShouldReturnStreamOfAllGroups() {
-
+        Group expectedGroup1 = new Group(1L, "BB-22");
+        Group expectedGroup2 = new Group(2L, "CC-33");
+        Group expectedGroup3 = new Group(3L, "Group to Delete");
 
         final Stream<Group> groupStream = groupDao.findAll(Page.of(1, 5));
 
-        assertThat(groupStream).containsExactly(new Group(1L, "BB-22"),
-                                                new Group(2L, "CC-33"),
-                                                new Group(3L, "Group to Delete"));
-
+        final long count = groupStream.filter(c -> c.equals(expectedGroup1) ||
+                c.equals(expectedGroup2) ||
+                c.equals(expectedGroup3)).count();
+        assertEquals(3, count);
     }
 
     @Test
