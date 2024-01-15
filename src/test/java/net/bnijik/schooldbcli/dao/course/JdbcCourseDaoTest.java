@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,16 +48,13 @@ class JdbcCourseDaoTest {
     @Test
     @DisplayName("when getting all courses should return a stream of all courses")
     void whenGettingAllCoursesShouldReturnStreamOfAllCourses() {
-        Course expectedCourse1 = new Course(1L, "Course1", "Description1");
-        Course expectedCourse2 = new Course(2L, "Course2", "Description2");
-        Course expectedCourse3 = new Course(3L, "Course to delete", "Description");
 
         final Stream<Course> courseStream = courseDao.findAll(Page.of(1, 5));
 
-        final long count = courseStream.filter(c -> c.equals(expectedCourse1) ||
-                c.equals(expectedCourse2) ||
-                c.equals(expectedCourse3)).count();
-        assertEquals(3, count);
+        assertThat(courseStream).containsExactly(new Course(1L, "Course1", "Description1"),
+                                                 new Course(2L, "Course2", "Description2"),
+                                                 new Course(3L, "Course to delete", "Description"));
+
     }
 
     @Test
