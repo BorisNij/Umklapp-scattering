@@ -1,5 +1,5 @@
 course:
-    find-by-id: SELECT course_id, course_name, course_description FROM courses WHERE course_id = :courseId
+    find-by-id: SELECT course_id, course_name, course_description FROM courses WHERE course_id = :courseId LIMIT 1
     find-all: SELECT course_id, course_name, course_description FROM courses ORDER BY course_id LIMIT :limit OFFSET :offset
     find-all-for-student:
         SELECT courses.course_id, courses.course_name, courses.course_description
@@ -10,8 +10,8 @@ course:
     update: UPDATE courses SET course_name = :courseName, course_description = :courseDescription WHERE course_id = :courseId
     delete-by-id: DELETE FROM courses WHERE course_id = :courseId
 group:
-    find-by-id: SELECT group_id, group_name FROM groups WHERE group_id = :groupId
-    find-by-name: SELECT group_id, group_name FROM groups WHERE group_name = :groupName
+    find-by-id: SELECT group_id, group_name FROM groups WHERE group_id = :groupId LIMIT 1
+    find-by-name: SELECT group_id, group_name FROM groups WHERE group_name = :groupName LIMIT 1
     find-all: SELECT group_id, group_name FROM groups ORDER BY group_id LIMIT :limit OFFSET :offset
     find-all-by-max-stud-count:
         SELECT groups.group_id, groups.group_name
@@ -23,7 +23,7 @@ group:
     update: UPDATE groups SET group_name = :groupName WHERE group_id = :groupId
     delete-by-id: DELETE FROM groups WHERE group_id = :groupId
 student:
-    find-by-id: SELECT student_id, group_id, first_name, last_name FROM students WHERE student_id = :studentId
+    find-by-id: SELECT student_id, group_id, first_name, last_name FROM students WHERE student_id = :studentId LIMIT 1
     find-all: SELECT student_id, group_id, first_name, last_name FROM students ORDER BY student_id LIMIT :limit OFFSET :offset
     find-all-by-course-name:
         SELECT students.student_id, students.first_name, students.last_name, students.group_id
