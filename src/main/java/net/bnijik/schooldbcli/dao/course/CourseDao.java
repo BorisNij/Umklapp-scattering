@@ -4,8 +4,8 @@ import net.bnijik.schooldbcli.dao.Dao;
 import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Course;
 
-import java.util.stream.Stream;
+import java.util.List;
 
 public interface CourseDao extends Dao<Course> {
-    Stream<Course> findAllForStudent(int studentId, Page page);
+    List<Course> findAllForStudent(int studentId, Page page);
 }

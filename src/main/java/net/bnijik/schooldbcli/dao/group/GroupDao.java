@@ -4,11 +4,11 @@ import net.bnijik.schooldbcli.dao.Dao;
 import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Group;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public interface GroupDao extends Dao<Group> {
     Optional<Group> findByName(String groupName);
 
-    Stream<Group> findAllByMaxStudentCount(int maxStudentCount, Page page);
+    List<Group> findAllByMaxStudentCount(int maxStudentCount, Page page);
 }
