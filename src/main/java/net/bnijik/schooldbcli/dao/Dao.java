@@ -1,10 +1,10 @@
 package net.bnijik.schooldbcli.dao;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public interface Dao<T> {
-    Stream<T> findAll(Page page);
+    List<T> findAll(Page page);
 
     long save(T t);
 

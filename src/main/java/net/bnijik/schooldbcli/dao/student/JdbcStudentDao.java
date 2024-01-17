@@ -5,6 +5,7 @@ import net.bnijik.schooldbcli.model.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Repository
 public class JdbcStudentDao implements StudentDao {
@@ -36,18 +36,18 @@ public class JdbcStudentDao implements StudentDao {
     }
 
     @Override
-    public Stream<Student> findAll(Page page) {
+    public List<Student> findAll(Page page) {
         String sql = queries.finaAll();
         try {
             log.debug("Finding all students with limit {}, offset {}", page.getLimit(), page.getOffset());
-            return template.queryForStream(sql,
-                                           Map.of(Page.PAGE_LIMIT_PARAM,
-                                                  page.getLimit(),
-                                                  Page.PAGE_OFFSET_PARAM,
-                                                  page.getOffset()),
-                                           rowMapper);
+            return template.query(sql,
+                                  Map.of(Page.PAGE_LIMIT_PARAM,
+                                         page.getLimit(),
+                                         Page.PAGE_OFFSET_PARAM,
+                                         page.getOffset()),
+                                  rowMapper);
         } catch (DataAccessException e) {
-            log.error("Error retrieving all students: {}", e.getMessage(), e);
+            log.error("Error finding all students: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -55,10 +55,8 @@ public class JdbcStudentDao implements StudentDao {
     @Override
     public long save(Student student) {
         try {
-            log.debug("Saving student {}", student.firstName());
-            final Number id = insert.executeAndReturnKey(Map.of(StudentQueries.STUDENT_ID_COLUMN,
-                                                                student.studentId(),
-                                                                StudentQueries.STUDENT_GROUP_ID_COLUMN,
+            log.debug("Saving {}", student);
+            final Number id = insert.executeAndReturnKey(Map.of(StudentQueries.STUDENT_GROUP_ID_COLUMN,
                                                                 student.groupId(),
                                                                 StudentQueries.STUDENT_FIRST_NAME_COLUMN,
                                                                 student.firstName(),
@@ -71,7 +69,7 @@ public class JdbcStudentDao implements StudentDao {
             log.info("Successfully saved new student with ID {}", id);
             return id.longValue();
         } catch (DataAccessException e) {
-            log.error("Error saving {} student: {}", student, e.getMessage(), e);
+            log.error("Error saving {}: {}", student, e.getMessage(), e);
             throw e;
         }
     }
@@ -81,7 +79,9 @@ public class JdbcStudentDao implements StudentDao {
         String sql = queries.findById();
         try {
             log.debug("Finding student with ID {}", id);
-            return template.queryForStream(sql, Map.of(StudentQueries.STUDENT_ID_PARAM, id), rowMapper).findFirst();
+            return DataAccessUtils.optionalResult(template.query(sql,
+                                                                 Map.of(StudentQueries.STUDENT_ID_PARAM, id),
+                                                                 rowMapper));
         } catch (DataAccessException e) {
             log.error("Error finding student with ID {}: {}", id, e.getMessage(), e);
             throw e;
@@ -92,7 +92,7 @@ public class JdbcStudentDao implements StudentDao {
     public boolean update(Student newStudent, long existingStudentId) {
         String sql = queries.update();
         try {
-            log.debug("Updating newStudent having ID {} with new details {}", existingStudentId, newStudent);
+            log.debug("Updating existing student having ID {} with new details {}", existingStudentId, newStudent);
             final int rowsAffected = template.update(sql,
                                                      Map.of(StudentQueries.STUDENT_FIRST_NAME_PARAM,
                                                             newStudent.firstName(),
@@ -103,13 +103,14 @@ public class JdbcStudentDao implements StudentDao {
                                                             StudentQueries.STUDENT_ID_PARAM,
                                                             existingStudentId));
             if (rowsAffected == 0) {
-                log.warn("No rows were affected while attempting to update group ID {}", existingStudentId);
+                log.warn("No rows were affected while attempting to update existing student having ID {}",
+                         existingStudentId);
                 return false;
             }
             log.info("Successfully updated student having ID {} with new details {}", existingStudentId, newStudent);
             return true;
         } catch (DataAccessException e) {
-            log.error("Error updating group with ID {}: {}", existingStudentId, e.getMessage(), e);
+            log.error("Error updating existing student with ID {}: {}", existingStudentId, e.getMessage(), e);
             throw e;
         }
     }
@@ -134,21 +135,21 @@ public class JdbcStudentDao implements StudentDao {
     }
 
     @Override
-    public Stream<Student> findAllByCourseName(String courseName, Page page) {
+    public List<Student> findAllByCourseName(String courseName, Page page) {
         String sql = queries.findAllByCourseName();
         try {
             log.debug("Finding all students enrolled in '{}' course with limit {} and offset {}",
                       courseName,
                       page.getLimit(),
                       page.getOffset());
-            return template.queryForStream(sql,
-                                           Map.of(StudentQueries.STUDENT_COURSE_NAME_PARAM,
-                                                  courseName,
-                                                  Page.PAGE_LIMIT_PARAM,
-                                                  page.getLimit(),
-                                                  Page.PAGE_OFFSET_PARAM,
-                                                  page.getOffset()),
-                                           rowMapper);
+            return template.query(sql,
+                                  Map.of(StudentQueries.STUDENT_COURSE_NAME_PARAM,
+                                         courseName,
+                                         Page.PAGE_LIMIT_PARAM,
+                                         page.getLimit(),
+                                         Page.PAGE_OFFSET_PARAM,
+                                         page.getOffset()),
+                                  rowMapper);
         } catch (DataAccessException e) {
             log.error("Error retrieving all students enrolled in '{}' course: {}", courseName, e.getMessage(), e);
             throw e;
@@ -161,12 +162,11 @@ public class JdbcStudentDao implements StudentDao {
         String sql = queries.enrollInCourses();
         try {
             log.debug("Enrolling student with ID {} into courses with IDs {}", studentId, courseIds);
-            int[] rowsInserted = template.batchUpdate(sql,
-                                                      courseIds.stream()
-                                                              .map(courseId -> new MapSqlParameterSource().addValue(
-                                                                      "studentId",
-                                                                      studentId).addValue("courseId", courseId))
-                                                              .toArray(MapSqlParameterSource[]::new));
+            final MapSqlParameterSource[] paramSources = courseIds.stream()
+                    .map(courseId -> new MapSqlParameterSource().addValue("studentId", studentId)
+                            .addValue("courseId", courseId))
+                    .toArray(MapSqlParameterSource[]::new);
+            int[] rowsInserted = template.batchUpdate(sql, paramSources);
 
             for (int rows : rowsInserted) {
                 if (rows <= 0) {
