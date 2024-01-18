@@ -5,10 +5,9 @@ import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Student;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public interface StudentDao extends Dao<Student> {
-    Stream<Student> findAllByCourseName(String courseName, Page page);
+    List<Student> findAllByCourseName(String courseName, Page page);
 
     boolean enrollInCourses(long studentId, List<Long> courseIds);
 

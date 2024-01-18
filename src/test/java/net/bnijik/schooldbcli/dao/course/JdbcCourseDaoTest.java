@@ -12,10 +12,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @ContextConfiguration(classes = {CourseQueries.class, JdbcCourseDaoTestConfig.class})
@@ -32,55 +30,46 @@ class JdbcCourseDaoTest {
         final Course expected = new Course(2L, "Course2", "Description2");
         final Optional<Course> optionalCourse = courseDao.findById(expected.courseId());
 
-        assertTrue(optionalCourse.isPresent(), "Course is not present");
-        assertEquals(expected, optionalCourse.get());
+        assertThat(optionalCourse).contains(expected);
     }
 
 
     @Test
     @DisplayName("when saving course should save course")
     void whenSavingCourseOfCertainNameShouldSaveCourse() {
-        Course fourthCourse = new Course(4L, "Course3", "Course3 description");
-        assertEquals(fourthCourse.courseId(), courseDao.save(fourthCourse));
+        Course fourthCourse = new Course(42344L, "Course3", "Course3 description");
+        assertThat(courseDao.save(fourthCourse)).isEqualTo(4L);
     }
 
     @Test
-    @DisplayName("when getting all courses should return a stream of all courses")
-    void whenGettingAllCoursesShouldReturnStreamOfAllCourses() {
-        Course expectedCourse1 = new Course(1L, "Course1", "Description1");
-        Course expectedCourse2 = new Course(2L, "Course2", "Description2");
-        Course expectedCourse3 = new Course(3L, "Course to delete", "Description");
+    @DisplayName("when finding all courses page should return a list of all courses on page")
+    void whenFindingAllCoursesPageShouldReturnAListOfAllCoursesOnPage() {
+        final List<Course> courses = courseDao.findAll(Page.of(1, 5));
 
-        final Stream<Course> courseStream = courseDao.findAll(Page.of(1, 5));
+        assertThat(courses).containsExactly(new Course(1L, "Course1", "Description1"),
+                                            new Course(2L, "Course2", "Description2"),
+                                            new Course(3L, "Course to delete", "Description"));
 
-        final long count = courseStream.filter(c -> c.equals(expectedCourse1) ||
-                c.equals(expectedCourse2) ||
-                c.equals(expectedCourse3)).count();
-        assertEquals(3, count);
     }
 
     @Test
     @DisplayName("when deleting course by id should remove it from the database")
     void whenDeletingCourseByIdShouldRemoveFromDatabase() {
-        assertTrue(courseDao.delete(1L));
+        assertThat(courseDao.delete(1L)).isTrue();
     }
 
     @Test
     @DisplayName("when updating existing course should update course")
-    void whenUpdatingExistingCourseShouldUpdateCourseWithRightDetails() {
-        assertTrue(courseDao.update(new Course(3L, "Modified course name", "Modified description"), 3L));
+    void whenUpdatingExistingCourseShouldUpdateCourse() {
+        assertThat(courseDao.update(new Course(3L, "Modified course name", "Modified description"), 3L)).isTrue();
     }
 
     @Test
-    @DisplayName("when getting courses for a student should return the correct courses")
-    void whenGettingCoursesForStudentShouldReturnCorrectCourses() {
-        Course expectedCourse1 = new Course(1L, "Course1", "Description1");
-        Course expectedCourse2 = new Course(2L, "Course2", "Description2");
-        List<Course> enrolledCourses = courseDao.findAllForStudent(1, Page.of(1, 5)).toList();
+    @DisplayName("when finding courses for a student should return the correct courses")
+    void whenFindingCoursesForAStudentShouldReturnTheCorrectCourses() {
+        List<Course> enrolledCourses = courseDao.findAllForStudent(1, Page.of(1, 5));
 
-
-        assertTrue(enrolledCourses.contains(expectedCourse1));
-        assertTrue(enrolledCourses.contains(expectedCourse2));
-        assertEquals(2, enrolledCourses.size());
+        assertThat(enrolledCourses).containsExactly(new Course(1L, "Course1", "Description1"),
+                                                    new Course(2L, "Course2", "Description2"));
     }
 }

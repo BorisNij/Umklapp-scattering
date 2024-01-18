@@ -14,10 +14,8 @@ import org.springframework.test.context.jdbc.Sql;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @ContextConfiguration(classes = {StudentQueries.class, JdbcStudentDaoConfig.class})
@@ -33,18 +31,16 @@ class JdbcStudentDaoTest {
     @DisplayName("when saving student should save student")
     void whenSavingStudentShouldSaveStudent() {
 
-        Student expectedStudent = new Student(4, 1, "John", "Doe");
+        Student expectedStudent = new Student(234, 1, "John", "Doe");
 
-        assertEquals(expectedStudent.studentId(), studentDao.save(expectedStudent));
+        assertThat(studentDao.save(expectedStudent)).isEqualTo(4);
     }
 
     @Test
     @DisplayName("when finding all students should return stream of all students")
     void whenFindingAllStudentsShouldReturnStreamOfAllStudents() {
 
-        Student expectedStudent1 = new Student(1L, 1L, "Jane", "Doe");
-        Student expectedStudent2 = new Student(2L, 2L, "Student", "ToRemove");
-        Student expectedStudent3 = new Student(3L, 2L, "Student2", "McStudent2");
+        final List<Student> studentStream = studentDao.findAll(Page.of(1, 5));
 
         final Stream<Student> studentStream = studentDao.findAll(Page.of(1, 5));
         final long count = studentStream.filter(c -> c.equals(expectedStudent1) ||
@@ -57,23 +53,22 @@ class JdbcStudentDaoTest {
     @DisplayName("when finding student by id should return the correct student")
     void whenFindingStudentByIdShouldReturnTheCorrectStudent() {
         Student expectedStudent = new Student(1L, 1L, "Jane", "Doe");
-        Optional<Student> retrievedStudentWrapper = studentDao.findById(expectedStudent.studentId());
+        Optional<Student> studentOptional = studentDao.findById(expectedStudent.studentId());
 
-        assertTrue(retrievedStudentWrapper.isPresent(), "Student is not present");
-        assertEquals(expectedStudent, retrievedStudentWrapper.get());
+        assertThat(studentOptional).hasValue(expectedStudent);
     }
 
     @Test
     @DisplayName("when updating existing student should update student")
     void whenUpdatingExistingStudentShouldUpdateStudent() {
-        assertTrue(studentDao.update(new Student(3L, 1, "Student2ModName", "McStudent2"), 3L));
+        assertThat(studentDao.update(new Student(3L, 1, "Student2ModName", "McStudent2"), 3L)).isTrue();
     }
 
     @Test
     @DisplayName("when deleting a student should remove it from the database")
     void whenDeletingAStudentShouldRemoveItFromTheDatabase() {
         final Student studentToRemove = new Student(2, 2, "Student", "ToRemove");
-        assertTrue(studentDao.delete(studentToRemove.studentId()));
+        assertThat(studentDao.delete(studentToRemove.studentId())).isTrue();
     }
 
     @Test
@@ -83,11 +78,10 @@ class JdbcStudentDaoTest {
         final Student student2 = new Student(2, 2, "Student", "ToRemove");
         final Course course2 = new Course(2, "Course2", "Description2");
 
-        final List<Student> students = studentDao.findAllByCourseName(course2.courseName(), Page.of(1, 5)).toList();
+        final List<Student> students = studentDao.findAllByCourseName(course2.courseName(), Page.of(1, 5));
 
-        assertEquals(2, students.size());
-        assertTrue(students.contains(student1));
-        assertTrue(students.contains(student2));
+        assertThat(students).containsExactly(new Student(1, 1, "Jane", "Doe"),
+                                             new Student(2, 2, "Student", "ToRemove"));
     }
 
     @Test
@@ -102,8 +96,8 @@ class JdbcStudentDaoTest {
         Course course1 = new Course(1, course1Name, course1Description);
         Course course2 = new Course(2, course2Name, course2Description);
 
-        assertTrue(studentDao.enrollInCourses(existingStudent.studentId(),
-                                              Arrays.asList(course1.courseId(), course2.courseId())));
+        assertThat(studentDao.enrollInCourses(existingStudent.studentId(),
+                                              Arrays.asList(course1.courseId(), course2.courseId()))).isTrue();
 
     }
 
@@ -113,7 +107,7 @@ class JdbcStudentDaoTest {
 
         Student createdStudent = new Student(1, 1, "Jane", "Doe");
         Course courseToWithdraw = new Course(1, "Course1", "Description1");
-        assertTrue(studentDao.withdrawFromCourse(createdStudent.studentId(), courseToWithdraw.courseId()));
 
+        assertThat(studentDao.withdrawFromCourse(createdStudent.studentId(), courseToWithdraw.courseId())).isTrue();
     }
 }

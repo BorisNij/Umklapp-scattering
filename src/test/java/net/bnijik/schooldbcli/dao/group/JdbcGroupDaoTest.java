@@ -12,9 +12,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @ContextConfiguration(classes = {GroupQueries.class, JdbcGroupDaoTestConfig.class})
@@ -32,40 +31,36 @@ class JdbcGroupDaoTest {
 
         final Group expected = new Group(4, "AA-11");
 
-        assertEquals(expected.groupId(), groupDao.save(expected));
+        assertThat(expected.groupId()).isEqualTo(groupDao.save(expected));
     }
 
+
     @Test
-    @DisplayName("when getting a group by ID should return the correct group")
-    void whenGettingGroupByIdShouldReturnCorrectGroup() {
+    @DisplayName("when finding a group by ID should return the correct group")
+    void whenFindingAGroupByIdShouldReturnTheCorrectGroup() {
         Group expectedGroup = new Group(1L, "BB-22");
 
-        Optional<Group> retrievedGroupWrapper = groupDao.findById(expectedGroup.groupId());
+        Optional<Group> groupOptional = groupDao.findById(expectedGroup.groupId());
 
-        assertTrue(retrievedGroupWrapper.isPresent(), "Group is not present");
-        assertEquals(expectedGroup, retrievedGroupWrapper.get(), "Retrieved group details are incorrect");
+        assertThat(groupOptional).contains(expectedGroup);
     }
 
 
     @Test
-    @DisplayName("when getting a group by name should return the correct group")
-    void whenGettingGroupByNameShouldReturnCorrectGroup() {
+    @DisplayName("when finding a group by name should return the correct group")
+    void whenFindingAGroupByNameShouldReturnTheCorrectGroup() {
         Group createdGroup = new Group(1, "BB-22");
 
-        Optional<Group> retrievedGroupWrapper = groupDao.findByName("BB-22");
+        Optional<Group> groupOptional = groupDao.findByName("BB-22");
 
-        assertTrue(retrievedGroupWrapper.isPresent(), "Group is not present");
-        assertEquals(createdGroup, retrievedGroupWrapper.get(), "Retrieved group details are incorrect");
+        assertThat(groupOptional).contains(createdGroup);
     }
 
     @Test
-    @DisplayName("when getting all groups should return a stream of all groups")
-    void whenGettingAllGroupsShouldReturnStreamOfAllGroups() {
-        Group expectedGroup1 = new Group(1L, "BB-22");
-        Group expectedGroup2 = new Group(2L, "CC-33");
-        Group expectedGroup3 = new Group(3L, "Group to Delete");
+    @DisplayName("when finding all groups should return a stream of all groups")
+    void whenFindingAllGroupsShouldReturnAStreamOfAllGroups() {
 
-        final Stream<Group> groupStream = groupDao.findAll(Page.of(1, 5));
+        final List<Group> groupStream = groupDao.findAll(Page.of(1, 5));
 
         final long count = groupStream.filter(c -> c.equals(expectedGroup1) ||
                 c.equals(expectedGroup2) ||
@@ -74,18 +69,15 @@ class JdbcGroupDaoTest {
     }
 
     @Test
-    @DisplayName("when getting groups by max student count should return correct groups")
-    void whenGettingGroupsByMaxStudentCountShouldReturnCorrectGroups() {
+    @DisplayName("when finding groups by max student count should return correct groups")
+    void whenFindingGroupsByMaxStudentCountShouldReturnCorrectGroups() {
         Group group1 = new Group(1, "BB-22");
         Group group2 = new Group(2, "CC-33");
         Group group3 = new Group(3, "Group to Delete");
 
-        List<Group> groups = groupDao.findAllByMaxStudentCount(1, Page.of(1, 5)).toList();
+        List<Group> groups = groupDao.findAllByMaxStudentCount(1, Page.of(1, 5));
 
-        assertEquals(2, groups.size());
-        assertTrue(groups.contains(group1));
-        assertTrue(groups.contains(group3));
-        assertFalse(groups.contains(group2));
+        assertThat(groups).contains(group1, group3).doesNotContain(group2).hasSize(2);
     }
 
     @Test
@@ -93,13 +85,13 @@ class JdbcGroupDaoTest {
     void whenDeletingGroupShouldRemoveFromDatabase() {
         Group groupToDelete = new Group(3, "Group to Delete");
 
-        assertTrue(groupDao.delete(groupToDelete.groupId()));
+        assertThat(groupDao.delete(groupToDelete.groupId())).isTrue();
     }
 
     @Test
     @DisplayName("when updating existing group should update group")
     void whenUpdatingExistingGroupShouldUpdateGroup() {
-        assertTrue(groupDao.update(new Group(3L, "Modified group name"), 3L));
+        assertThat(groupDao.update(new Group(3L, "Modified group name"), 3L)).isTrue();
     }
 
 }
