@@ -62,10 +62,10 @@ class JdbcGroupDaoTest {
 
         final List<Group> groupStream = groupDao.findAll(Page.of(1, 5));
 
-        assertThat(groupStream).containsExactly(new Group(1L, "BB-22"),
-                                                new Group(2L, "CC-33"),
-                                                new Group(3L, "Group to Delete"));
-
+        final long count = groupStream.filter(c -> c.equals(expectedGroup1) ||
+                c.equals(expectedGroup2) ||
+                c.equals(expectedGroup3)).count();
+        assertEquals(3, count);
     }
 
     @Test

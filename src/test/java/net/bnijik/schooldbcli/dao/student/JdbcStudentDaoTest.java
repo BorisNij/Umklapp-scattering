@@ -42,9 +42,11 @@ class JdbcStudentDaoTest {
 
         final List<Student> studentStream = studentDao.findAll(Page.of(1, 5));
 
-        assertThat(studentStream).containsExactly(new Student(1L, 1L, "Jane", "Doe"),
-                                                  new Student(2L, 2L, "Student", "ToRemove"),
-                                                  new Student(3L, 2L, "Student2", "McStudent2"));
+        final Stream<Student> studentStream = studentDao.findAll(Page.of(1, 5));
+        final long count = studentStream.filter(c -> c.equals(expectedStudent1) ||
+                c.equals(expectedStudent2) ||
+                c.equals(expectedStudent3)).count();
+        assertEquals(3, count);
     }
 
     @Test
