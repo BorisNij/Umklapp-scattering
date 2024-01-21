@@ -2,11 +2,14 @@ package net.bnijik.schooldbcli.service.course;
 
 import net.bnijik.schooldbcli.dao.course.CourseDao;
 import net.bnijik.schooldbcli.dto.CourseDto;
+import net.bnijik.schooldbcli.mapper.CourseMapper;
 import net.bnijik.schooldbcli.model.Course;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Optional;
 
@@ -15,8 +18,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {CourseServiceImpl.class, CourseServiceImplTestConfig.class})
+@SpringBootTest(classes = {CourseServiceImplTest.CourseServiceImplTestConfig.class, CourseServiceImpl.class})
 class CourseServiceImplTest {
+
+    @TestConfiguration
+    @ComponentScan(basePackageClasses = CourseMapper.class)
+    static class CourseServiceImplTestConfig {
+    }
 
     @MockBean
     CourseDao courseDao;
