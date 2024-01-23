@@ -5,31 +5,25 @@ import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.mapper.CourseMapper;
 import net.bnijik.schooldbcli.model.Course;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-
-import java.util.Optional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {CourseServiceImplTest.CourseServiceImplTestConfig.class, CourseServiceImpl.class})
+@ExtendWith(MockitoExtension.class)
 class CourseServiceImplTest {
 
-    @TestConfiguration
-    @ComponentScan(basePackageClasses = CourseMapper.class)
-    static class CourseServiceImplTestConfig {
-    }
-
-    @MockBean
+    @Mock
     CourseDao courseDao;
 
-    @Autowired
+    @Mock
+    CourseMapper courseMapper;
+
+    @InjectMocks
     CourseServiceImpl courseService;
 
     @Test
@@ -37,17 +31,13 @@ class CourseServiceImplTest {
 
         Course course = getCourseEntity();
 
-        when(courseDao.findById(course.courseId())).thenReturn(Optional.empty());
         when(courseDao.save(any(Course.class))).thenReturn(course.courseId());
 
         CourseDto newCourseDto = new CourseDto(123L, "Math", "Math Description");
+        when(courseMapper.dtoToModel(any(CourseDto.class))).thenReturn(course);
         final long id = courseService.save(newCourseDto);
 
         assertNotEquals(0, id);
-//        assertEquals(newCourseDto.getName(), courseDto.getName());
-//        assertEquals(newCourseDto.getDescription(), courseDto.getDescription());
-
-        verify(courseDao).save(any(Course.class));
     }
 
     private Course getCourseEntity() {
