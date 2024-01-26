@@ -7,5 +7,5 @@ import net.bnijik.schooldbcli.model.Course;
 import java.util.List;
 
 public interface CourseDao extends Dao<Course> {
-    List<Course> findAllForStudent(int studentId, Page page);
+    List<Course> findAllForStudent(long studentId, Page page);
 }

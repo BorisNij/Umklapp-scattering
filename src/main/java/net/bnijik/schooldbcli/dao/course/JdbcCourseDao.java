@@ -66,7 +66,7 @@ public class JdbcCourseDao implements CourseDao {
     }
 
     @Override
-    public List<Course> findAllForStudent(int studentId, Page page) {
+    public List<Course> findAllForStudent(long studentId, Page page) {
         try {
             log.debug("Finding all courses for student having ID {} with limit {} and offset {}",
                       studentId,

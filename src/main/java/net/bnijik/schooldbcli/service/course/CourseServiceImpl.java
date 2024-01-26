@@ -23,7 +23,7 @@ public class CourseServiceImpl extends SchoolAdminServiceImpl<CourseDto, Course>
     }
 
     @Override
-    public List<CourseDto> findAllForStudent(int studentId, Page page) {
+    public List<CourseDto> findAllForStudent(long studentId, Page page) {
         final List<Course> courses = courseDao.findAllForStudent(studentId, page);
         return courseMapper.modelsToDtos(courses);
     }
