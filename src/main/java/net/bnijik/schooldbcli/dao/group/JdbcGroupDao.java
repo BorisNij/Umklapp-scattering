@@ -4,6 +4,7 @@ import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -23,6 +24,7 @@ public class JdbcGroupDao implements GroupDao {
     private final RowMapper<Group> rowMapper = (rowSet, rowNum) -> new Group(rowSet.getLong(GroupQueries.GROUP_ID_COLUMN),
                                                                              rowSet.getString(GroupQueries.GROUP_NAME_COLUMN));
 
+    @Autowired
     public JdbcGroupDao(JdbcClient jdbcClient, SimpleJdbcInsert insert, GroupQueries queries) {
         this.insert = insert.withTableName(GroupQueries.GROUP_TABLE_NAME)
                 .usingGeneratedKeyColumns(GroupQueries.GROUP_ID_COLUMN);

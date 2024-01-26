@@ -4,6 +4,7 @@ import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -28,6 +29,7 @@ public class JdbcStudentDao implements StudentDao {
                                                                                  rowSet.getString(StudentQueries.STUDENT_FIRST_NAME_COLUMN),
                                                                                  rowSet.getString(StudentQueries.STUDENT_LAST_NAME_COLUMN));
 
+    @Autowired
     public JdbcStudentDao(NamedParameterJdbcTemplate template, SimpleJdbcInsert insert, StudentQueries queries) {
         this.insert = insert.withTableName(StudentQueries.STUDENT_TABLE_NAME)
                 .usingGeneratedKeyColumns(StudentQueries.STUDENT_ID_COLUMN);
