@@ -1,3 +1,5 @@
+school:
+    max-courses-per-student: ${MAX_COURSES_PER_STUDENT:3}
 spring:
   config:
     import: file:src/main/resources/.env[.properties]
