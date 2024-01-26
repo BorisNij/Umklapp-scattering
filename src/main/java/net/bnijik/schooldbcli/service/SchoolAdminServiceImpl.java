@@ -37,7 +37,7 @@ public class SchoolAdminServiceImpl<D, M> implements SchoolAdminService<D> {
     @Override
     public boolean update(D d, long id) {
         final M model = schoolModelMapper.dtoToModel(d);
-        return update(schoolModelMapper.modelToDto(model), id);
+        return dao.update(model, id);
     }
 
     @Override
