@@ -6,6 +6,7 @@ import net.bnijik.schooldbcli.dto.StudentDto;
 import net.bnijik.schooldbcli.mapper.StudentMapper;
 import net.bnijik.schooldbcli.model.Student;
 import net.bnijik.schooldbcli.service.SchoolAdminServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class StudentServiceImpl extends SchoolAdminServiceImpl<StudentDto, Stude
     private final StudentMapper studentMapper;
     private final StudentDao studentDao;
 
+    @Autowired
     public StudentServiceImpl(StudentMapper studentMapper, StudentDao studentDao) {
         super(studentMapper, studentDao);
         this.studentMapper = studentMapper;

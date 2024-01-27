@@ -6,6 +6,7 @@ import net.bnijik.schooldbcli.dto.CourseDto;
 import net.bnijik.schooldbcli.mapper.CourseMapper;
 import net.bnijik.schooldbcli.model.Course;
 import net.bnijik.schooldbcli.service.SchoolAdminServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class CourseServiceImpl extends SchoolAdminServiceImpl<CourseDto, Course>
     private final CourseDao courseDao;
     private final CourseMapper courseMapper;
 
+    @Autowired
     public CourseServiceImpl(CourseDao courseDao, CourseMapper courseMapper) {
         super(courseMapper, courseDao);
         this.courseDao = courseDao;

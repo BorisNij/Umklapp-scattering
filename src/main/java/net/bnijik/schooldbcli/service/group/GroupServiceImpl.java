@@ -6,6 +6,7 @@ import net.bnijik.schooldbcli.dto.GroupDto;
 import net.bnijik.schooldbcli.mapper.GroupMapper;
 import net.bnijik.schooldbcli.model.Group;
 import net.bnijik.schooldbcli.service.SchoolAdminServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class GroupServiceImpl extends SchoolAdminServiceImpl<GroupDto, Group> im
     private final GroupMapper groupMapper;
     private final GroupDao groupDao;
 
+    @Autowired
     public GroupServiceImpl(GroupMapper groupMapper, GroupDao groupDao) {
         super(groupMapper, groupDao);
         this.groupMapper = groupMapper;
