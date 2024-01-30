@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class SchoolAdminServiceImpl<D, M> implements SchoolAdminService<D> {
-    protected final SchoolModelMapper<M, D> schoolModelMapper;
-    protected final Dao<M> dao;
+    private final SchoolModelMapper<M, D> schoolModelMapper;
+    private final Dao<M> dao;
 
     public SchoolAdminServiceImpl(SchoolModelMapper<M, D> schoolModelMapper, Dao<M> dao) {
         this.schoolModelMapper = schoolModelMapper;
@@ -24,7 +24,8 @@ public class SchoolAdminServiceImpl<D, M> implements SchoolAdminService<D> {
 
     @Override
     public long save(D d) {
-        return dao.save(schoolModelMapper.dtoToModel(d));
+        final M model = schoolModelMapper.dtoToModel(d);
+        return dao.save(model);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class SchoolAdminServiceImpl<D, M> implements SchoolAdminService<D> {
     @Override
     public boolean update(D d, long id) {
         final M model = schoolModelMapper.dtoToModel(d);
-        return update(schoolModelMapper.modelToDto(model), id);
+        return dao.update(model, id);
     }
 
     @Override

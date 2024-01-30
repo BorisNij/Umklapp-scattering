@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface CourseService extends SchoolAdminService<CourseDto> {
 
-    List<CourseDto> findAllForStudent(int studentId, Page page);
+    List<CourseDto> findAllForStudent(long studentId, Page page);
 }

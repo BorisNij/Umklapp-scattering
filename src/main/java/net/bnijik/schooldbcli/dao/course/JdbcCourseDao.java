@@ -4,6 +4,7 @@ import net.bnijik.schooldbcli.dao.Page;
 import net.bnijik.schooldbcli.model.Course;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -24,6 +25,7 @@ public class JdbcCourseDao implements CourseDao {
                                                                                rowSet.getString(CourseQueries.COURSE_NAME_COLUMN),
                                                                                rowSet.getString(CourseQueries.COURSE_DESCRIPTION_COLUMN));
 
+    @Autowired
     public JdbcCourseDao(SimpleJdbcInsert insert, JdbcClient jdbcClient, CourseQueries queries) {
         this.insert = insert.withTableName(CourseQueries.COURSE_TABLE_NAME)
                 .usingGeneratedKeyColumns(CourseQueries.COURSE_ID_COLUMN);
@@ -66,7 +68,7 @@ public class JdbcCourseDao implements CourseDao {
     }
 
     @Override
-    public List<Course> findAllForStudent(int studentId, Page page) {
+    public List<Course> findAllForStudent(long studentId, Page page) {
         try {
             log.debug("Finding all courses for student having ID {} with limit {} and offset {}",
                       studentId,

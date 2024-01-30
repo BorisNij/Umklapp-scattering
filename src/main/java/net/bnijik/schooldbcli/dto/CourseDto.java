@@ -11,4 +11,13 @@ public record CourseDto(
         Objects.requireNonNull(courseName);
         Objects.requireNonNullElse(courseDescription, "");
     }
+
+    @Override
+    public String toString() {
+        return "{\n"
+                + "\t\"courseId\": " + courseId + ",\n"
+                + "\t\"courseName\": \"" + courseName + "\",\n"
+                + "\t\"courseDescription\": \"" + courseDescription + "\"\n"
+                + "}";
+    }
 }
