@@ -39,4 +39,9 @@ public class StudentServiceImpl extends SchoolAdminServiceImpl<StudentDto, Stude
     public boolean withdrawFromCourse(long studentId, long courseId) {
         return studentDao.withdrawFromCourse(studentId, courseId);
     }
+
+    @Override
+    public long save(String firstName, String lastName, long groupId) {
+        return super.save(studentMapper.modelToDto(new Student(0L, groupId, firstName, lastName)));
+    }
 }

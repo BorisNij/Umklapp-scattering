@@ -13,4 +13,6 @@ public interface StudentService extends SchoolAdminService<StudentDto> {
     boolean enrollInCourses(long studentId, List<Long> courseIds);
 
     boolean withdrawFromCourse(long studentId, long courseId);
+
+    long save(String firstName, String lastName, long groupId);
 }
