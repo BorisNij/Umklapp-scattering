@@ -32,6 +32,7 @@ public abstract class StudentMapper implements SchoolModelMapper<Student, Studen
     @Override
     public abstract List<StudentDto> modelsToDtos(Collection<Student> models);
 
+    @Mapping(target = "groupId", expression = "java(dto.group().groupId())")
     @Override
     public abstract Student dtoToModel(StudentDto dto);
 
