@@ -43,7 +43,7 @@ Unit testing of the service layer leverages Mockito to create stub test doubles 
 
 - To use a locally spun up Postgres Docker container:
   Modify the environment variables in `src/main/resources/.env_example` to your liking (or leave it as-is)
-  and then run following commands from the repo root directory in a CMD terminal -
+  and then run following commands from the repo root directory -
 
 ```shell
 cp -f "src/main/resources/.env_example" "src/main/resources/.env" && docker-compose -f "src/main/resources/docker-compose.yml" up -d && ./mvnw clean spring-boot:run
