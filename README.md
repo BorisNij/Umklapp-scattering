@@ -1,4 +1,4 @@
-# School Database Console
+# JDBC School Database Console
 
 This is a command line application for managing a school database. The application provides functionalities to interact
 with the database, including managing students, courses, and groups. It utilizes Spring Boot for dependency management
